@@ -1,0 +1,18 @@
+body {
+    background-color: #282727
+}
+h1 {
+    color: white
+}
+p {
+    color: white
+}
+a {
+    color: white
+}
+li::marker {
+    color: white
+}
+.link {
+    color: #64B5F6
+}
