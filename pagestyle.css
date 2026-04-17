@@ -135,7 +135,7 @@ header {
   height: 40px;
   transition: transform 0.3s ease;
   cursor: pointer;
-  border-radius: 20px;
+  border-radius: 2px;
 }
 
 .flags img:hover {
