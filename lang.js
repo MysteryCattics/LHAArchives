@@ -1,16 +1,17 @@
 // lang.js
 
+// ====== Куки ======
 function setCookie(name, value, days) {
   const d = new Date();
-  d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+  d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
   const expires = "expires=" + d.toUTCString();
-  document.cookie = name + "=" + value + ";" + expires + ";path=/";
+  document.cookie = `${name}=${value};${expires};path=/`;
 }
 
 function getCookie(name) {
   const cname = name + "=";
   const decodedCookie = decodeURIComponent(document.cookie);
-  const ca = decodedCookie.split(';');
+  const ca = decodedCookie.split(";");
   for (let i = 0; i < ca.length; i++) {
     let c = ca[i].trim();
     if (c.indexOf(cname) === 0) {
@@ -20,35 +21,52 @@ function getCookie(name) {
   return "";
 }
 
+// ====== Переклад ======
 async function setLang(lang) {
   try {
     const response = await fetch(`lang/${lang}.json`);
     const translations = await response.json();
 
-    // обновляем текст на странице
+    // оновлення тексту на сторінці
     document.querySelectorAll("[data-key]").forEach(el => {
       const key = el.getAttribute("data-key");
       if (translations[key]) {
-        el.textContent = translations[key];
+        // підтримка кнопок, інпутів, текстових елементів
+        if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+          el.placeholder = translations[key];
+        } else if (el.tagName === "BUTTON") {
+          el.textContent = translations[key];
+        } else {
+          el.textContent = translations[key];
+        }
       }
     });
 
-    // обновляем заголовок вкладки
+    // оновлення заголовка вкладки
     if (translations.pageTitle) {
       document.title = translations.pageTitle;
     }
 
-    // сохраняем язык
+    // збереження вибору
     setCookie("siteLang", lang, 30);
   } catch (err) {
-    console.error("Ошибка загрузки языка:", err);
+    console.error("Помилка завантаження мови:", err);
   }
 }
 
+// ====== Ініціалізація ======
 document.addEventListener("DOMContentLoaded", () => {
-  const savedLang = getCookie("siteLang") || "ru";
+  let savedLang = getCookie("siteLang");
+
+  // якщо куки немає — ставимо українську
+  if (!savedLang) {
+    savedLang = "ua";
+    setCookie("siteLang", savedLang, 30);
+  }
+
   setLang(savedLang);
 
+  // флаги для перемикання
   const uaFlag = document.querySelector(".ualang");
   const ruFlag = document.querySelector(".rulang");
 
